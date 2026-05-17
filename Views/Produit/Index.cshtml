@@ -1,0 +1,65 @@
+@model List<SecureApp.Models.Produit>
+
+@{
+    ViewData["Title"] = "Gestion des produits";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gestion des produits</h2>
+        @if (User.IsInRole("Admin") || User.IsInRole("Gestionnaire"))
+        {
+            <a asp-action="Create" class="btn btn-primary">+ Ajouter un produit</a>
+        }
+    </div>
+
+    <table class="table table-striped table-hover">
+        <thead class="table-primary">
+            <tr>
+                <th>Nom</th>
+                <th>Catégorie</th>
+                <th>Prix</th>
+                <th>Quantité</th>
+                <th>Statut</th>
+                @if (User.IsInRole("Admin") || User.IsInRole("Gestionnaire"))
+                {
+                    <th>Actions</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var produit in Model)
+            {
+                <tr>
+                    <td>@produit.Nom</td>
+                    <td>@produit.Categorie</td>
+                    <td>@produit.Prix.ToString("C")</td>
+                    <td>@produit.Quantite</td>
+                    <td>
+                        @if (produit.Quantite <= produit.SeuilAlerte)
+                        {
+                            <span class="badge bg-danger">Stock faible</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">En stock</span>
+                        }
+                    </td>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Gestionnaire"))
+                    {
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@produit.Id" class="btn btn-sm btn-warning">Modifier</a>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <form method="post" asp-action="Delete" asp-route-id="@produit.Id" style="display:inline">
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Supprimer ce produit ?')">Supprimer</button>
+                                </form>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

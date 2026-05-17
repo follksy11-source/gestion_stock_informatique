@@ -1,0 +1,104 @@
+@model List<Microsoft.AspNetCore.Identity.IdentityUser>
+
+@{
+    ViewData["Title"] = "Gestion des utilisateurs";
+    var userRoles = ViewBag.UserRoles as Dictionary<string, IList<string>>;
+    string[] tousLesRoles = { "Admin", "Gestionnaire", "Vendeur" };
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">
+        <i class="bi bi-shield-lock me-2 text-primary"></i>Gestion des utilisateurs
+    </h2>
+
+    @if (TempData["Erreur"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Erreur"]</div>
+    }
+
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <strong>Utilisateurs inscrits (@Model.Count)</strong>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Email</th>
+                        <th>Rôles actuels</th>
+                        <th>Promouvoir</th>
+                        <th>Rétrograder</th>
+                        <th>Supprimer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        var roles = userRoles![user.Id];
+                        <tr>
+                            <td>
+                                <i class="bi bi-person-circle me-1 text-muted"></i>
+                                @user.Email
+                                @if (user.Email == User.Identity!.Name)
+                                {
+                                    <span class="badge bg-secondary ms-1">Vous</span>
+                                }
+                            </td>
+                            <td>
+                                @if (roles.Count == 0)
+                                {
+                                    <span class="badge bg-secondary">Aucun rôle</span>
+                                }
+                                @foreach (var role in roles)
+                                {
+                                    <span class="badge @(role == "Admin" ? "bg-danger" : role == "Gestionnaire" ? "bg-warning text-dark" : "bg-info text-dark") me-1">
+                                        @role
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var role in tousLesRoles)
+                                {
+                                    if (!roles.Contains(role))
+                                    {
+                                        <form method="post" asp-action="PromouvoirRole" style="display:inline">
+                                            <input type="hidden" name="userId" value="@user.Id" />
+                                            <input type="hidden" name="role" value="@role" />
+                                            <button type="submit" class="btn btn-sm btn-outline-success me-1">
+                                                + @role
+                                            </button>
+                                        </form>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                @foreach (var role in roles)
+                                {
+                                    <form method="post" asp-action="RetirerRole" style="display:inline">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <input type="hidden" name="role" value="@role" />
+                                        <button type="submit" class="btn btn-sm btn-outline-warning me-1">
+                                            - @role
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                            <td>
+                                @if (user.Email != User.Identity!.Name)
+                                {
+                                    <form method="post" asp-action="Supprimer">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Supprimer cet utilisateur ?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
