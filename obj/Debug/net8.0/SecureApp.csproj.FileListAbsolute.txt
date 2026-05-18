@@ -135,3 +135,4 @@
 /home/phantom005/SecureApp/obj/Debug/net8.0/SecureApp.genruntimeconfig.cache
 /home/phantom005/SecureApp/obj/Debug/net8.0/ref/SecureApp.dll
 /home/phantom005/SecureApp/bin/Debug/net8.0/appsettings.Production.json
+/home/phantom005/SecureApp/obj/Debug/net8.0/SecureApp.sourcelink.json
